@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Local setup for data-drift-ML-PSI (macOS / Linux)
+# Local setup for data-concept-drift-tracker (macOS / Linux)
 set -euo pipefail
 cd "$(dirname "$0")"
 

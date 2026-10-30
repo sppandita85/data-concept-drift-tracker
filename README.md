@@ -1,4 +1,4 @@
-# data-drift-ML-PSI
+# data-concept-drift-tracker
 
 Laptop **failure-risk** ML pipeline (Lenovo labs): train & serve (Lab 5), optional edge canary (Lab 6), **production monitoring & data drift** (Lab 7), and **Capstone M4** closed-loop demo (retrain + baseline refresh).
 
@@ -34,4 +34,4 @@ cd lab7-dryrun/outputs && docker compose up -d --build
 - Prometheus: http://localhost:9090  
 - Drift metrics: http://localhost:9100/metrics  
 
-See [capstone-m4/README.md](capstone-m4/README.md) and [capstone-m4/RUNBOOK.md](capstone-m4/RUNBOOK.md) for thresholds and presentation flow.
+See **[STEPS.md](STEPS.md)** for the full Step 1–15 checklist, plus [capstone-m4/RUNBOOK.md](capstone-m4/RUNBOOK.md) for the demo script.
