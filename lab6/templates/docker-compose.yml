@@ -1,0 +1,46 @@
+services:
+  model-v1:
+    build: ./model_service
+    environment:
+      MODEL_DIR: /models/v1
+      EXTRA_DELAY_MS: "0"
+      FAIL_RATE: "0"
+    volumes:
+      - ./models/v1:/models/v1:ro
+    ports:
+      - "8001:8000"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  model-v2:
+    build: ./model_service
+    environment:
+      MODEL_DIR: /models/v2
+      EXTRA_DELAY_MS: "0"
+      FAIL_RATE: "0"
+    volumes:
+      - ./models/v2:/models/v2:ro
+    ports:
+      - "8002:8000"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  router:
+    build: ./router
+    environment:
+      ROUTER_CONFIG: /app/router_config.json
+      LOG_DIR: /logs
+    volumes:
+      - ./router/router_config.json:/app/router_config.json
+      - ./logs:/logs
+    ports:
+      - "8000:8000"
+    depends_on:
+      - model-v1
+      - model-v2

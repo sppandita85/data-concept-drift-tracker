@@ -1,0 +1,135 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: lab7-alerts
+    folder: Lab 7
+    interval: 1m
+    rules:
+      - uid: lab7-p95-latency
+        title: Lab7 p95 latency above 200ms
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: prometheus
+            model:
+              expr: histogram_quantile(0.95, sum(rate(failure_api_latency_seconds_bucket{endpoint="/predict"}[5m])) by (le))
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+              refId: B
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator: { type: gt, params: [0.2] }
+                  operator: { type: and }
+                  reducer: { type: last }
+              refId: C
+        for: 2m
+        labels: { severity: warning }
+        annotations:
+          summary: p95 latency above 200 ms
+
+      - uid: lab7-error-rate
+        title: Lab7 error rate above 2%
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: prometheus
+            model:
+              expr: sum(rate(failure_api_errors_total[5m])) / clamp_min(sum(rate(failure_api_requests_total[5m])), 1e-9)
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+              refId: B
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator: { type: gt, params: [0.02] }
+                  operator: { type: and }
+                  reducer: { type: last }
+              refId: C
+        for: 2m
+        labels: { severity: warning }
+        annotations:
+          summary: API error rate above 2%
+
+      - uid: lab7-drift-cpu
+        title: Lab7 cpu_temp_avg drift above 0.25
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model:
+              expr: feature_drift_score{feature="cpu_temp_avg"}
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+              refId: B
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator: { type: gt, params: [0.25] }
+                  operator: { type: and }
+                  reducer: { type: last }
+              refId: C
+        for: 1m
+        labels: { severity: critical }
+        annotations:
+          summary: cpu_temp_avg drift detected (firmware shift scenario)
+
+      - uid: lab7-high-risk-share
+        title: Lab7 high-risk share above 20%
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: prometheus
+            model:
+              expr: sum(rate(failure_predictions_high_risk_total[5m])) / clamp_min(sum(rate(failure_predictions_total[5m])), 1e-9)
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+              refId: B
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator: { type: gt, params: [0.2] }
+                  operator: { type: and }
+                  reducer: { type: last }
+              refId: C
+        for: 2m
+        labels: { severity: warning }
+        annotations:
+          summary: High-risk prediction share above 20%

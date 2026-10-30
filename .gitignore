@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+lab5/outputs/
+lab6/outputs/
+lab7-dryrun/outputs/
+capstone-m4/logs/
+lab5/lab5_failure_model_executed.ipynb
+*.egg-info/
+.DS_Store
+.ipynb_checkpoints/

@@ -1,0 +1,58 @@
+networks:
+  lab7net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.255.201.0/24
+
+services:
+  api:
+    build: ./api
+    networks: [lab7net]
+    ports:
+      - "${LAB7_API_PORT:-8088}:8000"
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    networks: [lab7net]
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    networks: [lab7net]
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  drift:
+    build: ./drift_job
+    networks: [lab7net]
+    ports:
+      - "9100:9100"
+    environment:
+      DRIFT_INTERVAL_SEC: "60"
+      DRIFT_WINDOW: "1000"
+    volumes:
+      - ./logs:/logs
+      - ./data:/data:ro
+      - ./reports:/reports
+    depends_on:
+      - api
+    restart: unless-stopped

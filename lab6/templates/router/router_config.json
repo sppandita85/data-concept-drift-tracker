@@ -1,0 +1,9 @@
+{
+  "v1_url": "http://127.0.0.1:8001",
+  "v2_url": "http://127.0.0.1:8002",
+  "v2_percent": 0,
+  "auto_rollback": true,
+  "p95_limit_ms": 200,
+  "error_limit_pct": 1.0,
+  "rollback_check_every_n_v2": 50
+}
